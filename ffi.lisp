@@ -1,930 +1,923 @@
 (in-package #:cl-gccjit-ffi)
 
-(cffi:define-foreign-library libgccjit
-  (:darwin "libgccjit.dylib")
-  (:unix "libgccjit.so")
-  (t "libgccjit"))
-
-(cffi:use-foreign-library libgccjit)
-
 ;;; Data structures
-(defctype gcc-jit-context :pointer)
-(defctype gcc-jit-result :pointer)
+(defctype context :pointer)
+(defctype result :pointer)
 
-(defctype gcc-jit-object :pointer)
-(defctype gcc-jit-location :pointer)
-(defctype gcc-jit-type :pointer)
-(defctype gcc-jit-field :pointer)
-(defctype gcc-jit-struct :pointer)
-(defctype gcc-jit-function-type :pointer)
-(defctype gcc-jit-vector-type :pointer)
-(defctype gcc-jit-function :pointer)
-(defctype gcc-jit-block :pointer)
-(defctype gcc-jit-rvalue :pointer)
-(defctype gcc-jit-lvalue :pointer)
-(defctype gcc-jit-param :pointer)
-(defctype gcc-jit-case :pointer)
-(defctype gcc-jit-extended-asm :pointer)
+(defctype object :pointer)
+(defctype location :pointer)
+(defctype type :pointer)
+(defctype field :pointer)
+(defctype struct :pointer)
+(defctype function-type :pointer)
+(defctype vector-type :pointer)
+(defctype function :pointer)
+(defctype block :pointer)
+(defctype rvalue :pointer)
+(defctype lvalue :pointer)
+(defctype param :pointer)
+(defctype case :pointer)
+(defctype extended-asm :pointer)
 
 ;;; Context
-(defcfun gcc-jit-context-acquire gcc-jit-context)
+(defcfun context-acquire context)
 
-(defcfun gcc-jit-context-release :void
-  (ctxt gcc-jit-context))
+(defcfun context-release :void
+  (ctxt context))
 
-(defcenum gcc-jit-str-option
-  :progname
-  :special-chars-in-func-names
+(defcenum str-option
+  :str-option-progname
+  :str-option-special-chars-in-func-names
   :num-str-options)
 
-(defcenum gcc-jit-int-option
-  :optimization-level
+(defcenum int-option
+  :int-option-optimization-level
   :num-int-options)
 
-(defcenum gcc-jit-bool-option
-  :debuginfo
-  :dump-initial-tree
-  :dump-initial-gimple
-  :dump-generated-code
-  :dump-summary
-  :dump-everything
-  :selfcheck-gc
-  :keep-intermediates
+(defcenum bool-option
+  :bool-option-debuginfo
+  :bool-option-dump-initial-tree
+  :bool-option-dump-initial-gimple
+  :bool-option-dump-generated-code
+  :bool-option-dump-summary
+  :bool-option-dump-everything
+  :bool-option-selfcheck-gc
+  :bool-option-keep-intermediates
   :num-bool-options)
 
-(defcfun gcc-jit-context-set-str-option :void
-  (ctxt gcc-jit-context)
-  (opt gcc-jit-str-option)
+(defcfun context-set-str-option :void
+  (ctxt context)
+  (opt str-option)
   (value :string))
 
-(defcfun gcc-jit-context-set-int-option :void
-  (ctxt gcc-jit-context)
-  (opt gcc-jit-int-option)
+(defcfun context-set-int-option :void
+  (ctxt context)
+  (opt int-option)
   (value :int))
 
-(defcfun gcc-jit-context-set-bool-option :void
-  (ctxt gcc-jit-context)
-  (opt gcc-jit-bool-option)
+(defcfun context-set-bool-option :void
+  (ctxt context)
+  (opt bool-option)
   (value :int))
 
-;#+gcc-jit-allow-unreachable-blocks
-(defcfun gcc-jit-context-set-bool-allow-unreachable-blocks :void
-  (ctxt gcc-jit-context)
+;#+allow-unreachable-blocks
+(defcfun context-set-bool-allow-unreachable-blocks :void
+  (ctxt context)
   (bool-value :int))
 
-;#+gcc-jit-print-errors-to-stderr
-(defcfun gcc-jit-context-set-bool-print-errors-to-stderr :void
-  (ctxt gcc-jit-context)
+;#+print-errors-to-stderr
+(defcfun context-set-bool-print-errors-to-stderr :void
+  (ctxt context)
   (enabled :int))
 
-;#+gcc-jit-use-external-driver
-(defcfun gcc-jit-context-set-bool-use-external-driver :void
-  (ctxt gcc-jit-context)
+;#+use-external-driver
+(defcfun context-set-bool-use-external-driver :void
+  (ctxt context)
   (bool-value :int))
 
-;#+gcc-jit-command-line-option
-(defcfun gcc-jit-context-add-command-line-option :void
-  (ctxt gcc-jit-context)
+;#+command-line-option
+(defcfun context-add-command-line-option :void
+  (ctxt context)
   (optname :string))
 
-;#+gcc-jit-driver-option
-(defcfun gcc-jit-context-add-driver-option :void
-  (ctxt gcc-jit-context)
+;#+driver-option
+(defcfun context-add-driver-option :void
+  (ctxt context)
   (optname :string))
 
-(defcfun gcc-jit-context-compile gcc-jit-result
-  (ctxt gcc-jit-context))
+(defcfun context-compile result
+  (ctxt context))
 
-(defcenum gcc-jit-output-kind
-  :assmebler
-  :object-file
-  :dynamic-library
-  :executable)
+(defcenum output-kind
+  :output-kind-assmebler
+  :output-kind-object-file
+  :output-kind-dynamic-library
+  :output-kind-executable)
 
-(defcfun gcc-jit-context-compile-to-file :void
-  (ctxt gcc-jit-context)
-  (output-kind gcc-jit-output-kind)
+(defcfun context-compile-to-file :void
+  (ctxt context)
+  (output-kind output-kind)
   (output-path :string))
 
-(defcfun gcc-jit-context-dump-to-file :void
-  (ctxt gcc-jit-context)
+(defcfun context-dump-to-file :void
+  (ctxt context)
   (path :string)
   (update-locations :int))
 
-(defcfun gcc-jit-context-set-logfile :void
-  (ctxt gcc-jit-context)
+(defcfun context-set-logfile :void
+  (ctxt context)
   (logfile :pointer)
   (flags :int)
   (verbosity :int))
 
-(defcfun gcc-jit-context-get-first-error :string
-  (ctxt gcc-jit-context))
+(defcfun context-get-first-error :string
+  (ctxt context))
 
-(defcfun gcc-jit-context-get-last-error :string
-  (ctxt gcc-jit-context))
+(defcfun context-get-last-error :string
+  (ctxt context))
 
-(defcfun gcc-jit-result-get-code :pointer
-  (result gcc-jit-result)
+(defcfun result-get-code :pointer
+  (result result)
   (funcname :string))
 
-(defcfun gcc-jit-result-get-global :pointer
-  (result gcc-jit-result)
+(defcfun result-get-global :pointer
+  (result result)
   (name :string))
 
-(defcfun gcc-jit-result-release :void
-  (result gcc-jit-result))
+(defcfun result-release :void
+  (result result))
 
 ;;; Objects
-(defcfun gcc-jit-object-get-context gcc-jit-context
-  (obj gcc-jit-object))
+(defcfun object-get-context context
+  (obj object))
 
-(defcfun gcc-jit-object-get-debug-string :string
-  (obj gcc-jit-object))
+(defcfun object-get-debug-string :string
+  (obj object))
 
 ;;; Debugging information
-(defcfun gcc-jit-context-new-location gcc-jit-location
-  (ctxt gcc-jit-context)
+(defcfun context-new-location location
+  (ctxt context)
   (filename :string)
   (line :int)
   (column :int))
 
-(defcfun gcc-jit-location-as-object gcc-jit-object
-  (loc gcc-jit-location))
+(defcfun location-as-object object
+  (loc location))
 
 ;;; Types
-(defcfun gcc-jit-type-as-object gcc-jit-object
-  (type gcc-jit-type))
+(defcfun type-as-object object
+  (type type))
 
-(defcenum gcc-jit-types
-  :void                                 ; C's "void" type
-  :void-ptr                             ; "void *"
+(defcenum types
+  :type-void                                 ; C's "void" type
+  :type-void-ptr                             ; "void *"
 
   ;; C++'s bool type and C99 "_Bool" type, aka "bool" if using stdbool.h
-  :bool
+  :type-bool
 
   ;; C's "char" and the variants
-  :char
-  :signed-char
-  :unsigned-int-char
+  :type-char
+  :type-signed-char
+  :type-unsigned-int-char
 
   ;; C's integer types
-  :short
-  :unsigned-int-short
-  :int
-  :unsigned-int-int
-  :long
-  :unsigned-int-long
-  :long-long
-  :unsigned-int-long-long
+  :type-short
+  :type-unsigned-int-short
+  :type-int
+  :type-unsigned-int-int
+  :type-long
+  :type-unsigned-int-long
+  :type-long-long
+  :type-unsigned-int-long-long
 
   ;; floating-point types
-  :float
-  :double
-  :long-double
+  :type-float
+  :type-double
+  :type-long-double
 
   ;; C's "const char*"
-  :const-char-ptr
+  :type-const-char-ptr
 
   ;; C's "size_t"
-  :size-t
+  :type-size-t
 
   ;; "FILE *" from stdio.h
-  :file-ptr
+  :type-file-ptr
 
   ;; Complex types
-  :complex-float
-  :complex-double
-  :complex-long-double
+  :type-complex-float
+  :type-complex-double
+  :type-complex-long-double
 
   ;; Sized integer types
-  :uint8-t
-  :uint16-t
-  :uint32-t
-  :uint64-t
-  :uint128-t
-  :int8-t
-  :int16-t
-  :int32-t
-  :int64-t
-  :int128-t
+  :type-uint8-t
+  :type-uint16-t
+  :type-uint32-t
+  :type-uint64-t
+  :type-uint128-t
+  :type-int8-t
+  :type-int16-t
+  :type-int32-t
+  :type-int64-t
+  :type-int128-t
 
-  :bfloat16)
+  :type-bfloat16)
 
-(defcfun gcc-jit-context-get-type gcc-jit-type
-  (ctxt gcc-jit-context)
-  (type gcc-jit-types))
+(defcfun context-get-type type
+  (ctxt context)
+  (type types))
 
-(defcfun gcc-jit-context-get-int-type gcc-jit-type
-  (ctxt gcc-jit-context)
+(defcfun context-get-int-type type
+  (ctxt context)
   (num-bytes :int)
   (is-signed :int))
 
-(defcfun gcc-jit-type-get-pointer gcc-jit-type
-  (type gcc-jit-type))
+(defcfun type-get-pointer type
+  (type type))
 
-(defcfun gcc-jit-type-get-const gcc-jit-type
-  (type gcc-jit-type))
+(defcfun type-get-const type
+  (type type))
 
 
-(defcfun gcc-jit-type-get-volatile gcc-jit-type
-  (type gcc-jit-type))
+(defcfun type-get-volatile type
+  (type type))
 
-;#+gcc-jit-type-get-restrict
-(defcfun gcc-jit-type-get-restrict gcc-jit-type
-  (type gcc-jit-type))
+;#+type-get-restrict
+(defcfun type-get-restrict type
+  (type type))
 
-;#+gcc-jit-sized-integers
-(defcfun gcc-jit-compatible-types :int
-  (ltype gcc-jit-type)
-  (rtype gcc-jit-type))
+;#+sized-integers
+(defcfun compatible-types :int
+  (ltype type)
+  (rtype type))
 
-;#+gcc-jit-sized-integers
-(defcfun gcc-jit-type-get-size :ssize
-  (type gcc-jit-type))
+;#+sized-integers
+(defcfun type-get-size :ssize
+  (type type))
 
-(defcfun gcc-jit-context-new-array-type gcc-jit-type
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (element-type gcc-jit-type)
+(defcfun context-new-array-type type
+  (ctxt context)
+  (loc location)
+  (element-type type)
   (num-elements :int))
 
-(defcfun gcc-jit-context-new-field gcc-jit-field
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (type gcc-jit-type)
+(defcfun context-new-field field
+  (ctxt context)
+  (loc location)
+  (type type)
   (name :string))
 
-;#+gcc-jit-context-new-bitfield
-(defcfun gcc-jit-context-new-bitfield gcc-jit-field
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (type gcc-jit-type)
+;#+context-new-bitfield
+(defcfun context-new-bitfield field
+  (ctxt context)
+  (loc location)
+  (type type)
   (width :int)
   (name :string))
 
-(defcfun gcc-jit-field-as-object gcc-jit-object
-  (field gcc-jit-field))
+(defcfun field-as-object object
+  (field field))
 
-(defcfun gcc-jit-context-new-struct-type gcc-jit-struct
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
+(defcfun context-new-struct-type struct
+  (ctxt context)
+  (loc location)
   (name :string)
   (num-fields :int)
-  (fields (:pointer gcc-jit-field)))
+  (fields (:pointer field)))
 
-(defcfun gcc-jit-context-new-opaque-struct gcc-jit-struct
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
+(defcfun context-new-opaque-struct struct
+  (ctxt context)
+  (loc location)
   (name :string))
 
-(defcfun gcc-jit-struct-as-type gcc-jit-type
-  (struct-type gcc-jit-struct))
+(defcfun struct-as-type type
+  (struct-type struct))
 
-(defcfun gcc-jit-struct-set-fields gcc-jit-struct
-  (struct-type gcc-jit-struct)
-  (loc gcc-jit-location)
+(defcfun struct-set-fields struct
+  (struct-type struct)
+  (loc location)
   (num-fields :int)
-  (fields (:pointer gcc-jit-field)))
+  (fields (:pointer field)))
 
-(defcfun gcc-jit-struct-get-field gcc-jit-field
-  (struct-type gcc-jit-struct)
+(defcfun struct-get-field field
+  (struct-type struct)
   (index :size))
 
-(defcfun gcc-jit-struct-get-field-count :size
-  (struct-type gcc-jit-struct))
+(defcfun struct-get-field-count :size
+  (struct-type struct))
 
-(defcfun gcc-jit-context-new-union-type gcc-jit-type
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
+(defcfun context-new-union-type type
+  (ctxt context)
+  (loc location)
   (name :string)
   (num-fields :int)
-  (fields (:pointer gcc-jit-field)))
+  (fields (:pointer field)))
 
-(defcfun gcc-jit-context-new-funciton-ptr-type gcc-jit-type
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (return-type gcc-jit-type)
+(defcfun context-new-funciton-ptr-type type
+  (ctxt context)
+  (loc location)
+  (return-type type)
   (num-params :int)
-  (param-types (:pointer gcc-jit-type))
+  (param-types (:pointer type))
   (is-variadic :int))
 
 ;;; Constructing functions
-(defcfun gcc-jit-context-new-param gcc-jit-param
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (type gcc-jit-type)
+(defcfun context-new-param param
+  (ctxt context)
+  (loc location)
+  (type type)
   (name :string))
 
-(defcfun gcc-jit-param-as-object gcc-jit-object
-  (param gcc-jit-param))
+(defcfun param-as-object object
+  (param param))
 
-(defcfun gcc-jit-param-as-lvalue gcc-jit-lvalue
-  (param gcc-jit-param))
+(defcfun param-as-lvalue lvalue
+  (param param))
 
-(defcfun gcc-jit-param-as-rvalue gcc-jit-rvalue
-  (param gcc-jit-param))
+(defcfun param-as-rvalue rvalue
+  (param param))
 
-(defcenum gcc-jit-function-kind
-  :exported
-  :internel
-  :imported
-  :always-inline)
+(defcenum function-kind
+  :function-kind-exported
+  :function-kind-internel
+  :function-kind-imported
+  :function-kind-always-inline)
 
-(defcenum gcc-jit-tls-model
-  :none
-  :global-dynamic
-  :local-dynamic
-  :initial-exec
-  :local-exec)
+(defcenum tls-model
+  :tls-model-none
+  :tls-model-global-dynamic
+  :tls-model-local-dynamic
+  :tls-model-initial-exec
+  :tls-model-local-exec)
 
-(defcfun gcc-jit-context-new-function gcc-jit-function
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (kind gcc-jit-function-kind)
-  (return-type gcc-jit-type)
+(defcfun context-new-function function
+  (ctxt context)
+  (loc location)
+  (kind function-kind)
+  (return-type type)
   (name :string)
   (num-params :int)
-  (params (:pointer gcc-jit-param))
+  (params (:pointer param))
   (is-variadic :int))
 
-(defcfun gcc-jit-context-get-builtin-function gcc-jit-function
-  (ctxt gcc-jit-context)
+(defcfun context-get-builtin-function function
+  (ctxt context)
   (name :string))
 
-(defcfun gcc-jit-function-as-object gcc-jit-object
-  (func gcc-jit-function))
+(defcfun function-as-object object
+  (func function))
 
-(defcfun gcc-jit-function-get-param gcc-jit-param
-  (func gcc-jit-function)
+(defcfun function-get-param param
+  (func function)
   (index :int))
 
-(defcfun gcc-jit-function-dump-to-dot :void
-  (func gcc-jit-function)
+(defcfun function-dump-to-dot :void
+  (func function)
   (path :string))
 
 ;;; Block
-(defcfun gcc-jit-function-new-block gcc-jit-block
-  (func gcc-jit-function)
+(defcfun function-new-block block
+  (func function)
   (name :string))
 
-(defcfun gcc-jit-block-as-object gcc-jit-object
-  (block_ gcc-jit-block))
+(defcfun block-as-object object
+  (block_ block))
 
-(defcfun gcc-jit-block-get-function gcc-jit-function
-  (block_ gcc-jit-block))
+(defcfun block-get-function function
+  (block_ block))
 
 ;;; lvalues, rvalues and expressions
-(defcenum gcc-jit-global-kind
-  :exported
-  :internal
-  :imported)
+(defcenum global-kind
+  :global-kind-exported
+  :global-kind-internal
+  :global-kind-imported)
 
-(defcfun gcc-jit-context-new-global gcc-jit-lvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (kind gcc-jit-global-kind)
-  (type gcc-jit-type)
+(defcfun context-new-global lvalue
+  (ctxt context)
+  (loc location)
+  (kind global-kind)
+  (type type)
   (name :string))
 
-;#+gcc-jit-ctors
-(defcfun gcc-jit-context-new-struct-constructor gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (type gcc-jit-type)
+;#+ctors
+(defcfun context-new-struct-constructor rvalue
+  (ctxt context)
+  (loc location)
+  (type type)
   (num-values :size)
-  (fields (:pointer gcc-jit-field))
-  (values (:pointer gcc-jit-rvalue)))
+  (fields (:pointer field))
+  (values (:pointer rvalue)))
 
-;#+gcc-jit-ctors
-(defcfun gcc-jit-context-new-union-constructor gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (type gcc-jit-type)
-  (field gcc-jit-field)
-  (value gcc-jit-rvalue))
+;#+ctors
+(defcfun context-new-union-constructor rvalue
+  (ctxt context)
+  (loc location)
+  (type type)
+  (field field)
+  (value rvalue))
 
-;#+gcc-jit-ctors
-(defcfun gcc-jit-context-new-array-constructor gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (type gcc-jit-type)
+;#+ctors
+(defcfun context-new-array-constructor rvalue
+  (ctxt context)
+  (loc location)
+  (type type)
   (num-values :size)
-  (values (:pointer gcc-jit-rvalue)))
+  (values (:pointer rvalue)))
 
-;#+gcc-jit-ctors
-(defcfun gcc-jit-global-set-initializer-rvalue gcc-jit-lvalue
-  (ctxt gcc-jit-lvalue)
-  (init-value gcc-jit-rvalue))
+;#+ctors
+(defcfun global-set-initializer-rvalue lvalue
+  (ctxt lvalue)
+  (init-value rvalue))
 
-;#+gcc-jit-get-target-builtin-function
-(defcfun gcc-jit-context-get-target-builtin-funciton gcc-jit-function
-  (ctxt gcc-jit-context)
+;#+get-target-builtin-function
+(defcfun context-get-target-builtin-funciton function
+  (ctxt context)
   (name :string))
 
-;#+gcc-jit-global-set-initializer
-(defcfun gcc-jit-global-set-initializer gcc-jit-lvalue
-  (global gcc-jit-lvalue)
+;#+global-set-initializer
+(defcfun global-set-initializer lvalue
+  (global lvalue)
   (blob :pointer)
   (num-bytes :size))
 
-;#+gcc-jit-global-set-readonly
-(defcfun gcc-jit-global-set-randomly :void
-  (global gcc-jit-lvalue))
+;#+global-set-readonly
+(defcfun global-set-randomly :void
+  (global lvalue))
 
-(defcfun gcc-jit-lvalue-as-object gcc-jit-object
-  (lvalue gcc-jit-lvalue))
+(defcfun lvalue-as-object object
+  (lvalue lvalue))
 
-(defcfun gcc-jit-lvalue-as-rvalue gcc-jit-rvalue
-  (rvalue gcc-jit-lvalue))
+(defcfun lvalue-as-rvalue rvalue
+  (rvalue lvalue))
 
-(defcfun gcc-jit-rvalue-as-object gcc-jit-object
-  (rvalue gcc-jit-rvalue))
+(defcfun rvalue-as-object object
+  (rvalue rvalue))
 
-(defcfun gcc-jit-rvalue-get-type gcc-jit-type
-  (rvalue gcc-jit-rvalue))
+(defcfun rvalue-get-type type
+  (rvalue rvalue))
 
-(defcfun gcc-jit-context-new-rvalue-from-int gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (numeric-type gcc-jit-type)
+(defcfun context-new-rvalue-from-int rvalue
+  (ctxt context)
+  (numeric-type type)
   (value :int))
 
-(defcfun gcc-jit-context-new-rvalue-from-long gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (numeric-type gcc-jit-type)
+(defcfun context-new-rvalue-from-long rvalue
+  (ctxt context)
+  (numeric-type type)
   (value :long))
 
-(defcfun gcc-jit-context-zero gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (numeric-type gcc-jit-type))
+(defcfun context-zero rvalue
+  (ctxt context)
+  (numeric-type type))
 
-(defcfun gcc-jit-context-one gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (numeric-type gcc-jit-type))
+(defcfun context-one rvalue
+  (ctxt context)
+  (numeric-type type))
 
-(defcfun gcc-jit-context-new-rvalue-from-double gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (numeric-type gcc-jit-type)
+(defcfun context-new-rvalue-from-double rvalue
+  (ctxt context)
+  (numeric-type type)
   (value :double))
 
-(defcfun gcc-jit-context-new-rvalue-from-ptr gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (pointer-type gcc-jit-type)
+(defcfun context-new-rvalue-from-ptr rvalue
+  (ctxt context)
+  (pointer-type type)
   (value :pointer))
 
-(defcfun gcc-jit-context-null gcc-jit-rvalue
-  (ctxt gcc-jit-context))
+(defcfun context-null rvalue
+  (ctxt context))
 
-;#+gcc-jit-context-new-sizeof
-(defcfun gcc-jit-context-new-sizeof gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (type gcc-jit-type))
+;#+context-new-sizeof
+(defcfun context-new-sizeof rvalue
+  (ctxt context)
+  (type type))
 
-;#+gcc-jit-context-new-alignof
-(defcfun gcc-jit-context-new-alignof gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (type gcc-jit-type))
+;#+context-new-alignof
+(defcfun context-new-alignof rvalue
+  (ctxt context)
+  (type type))
 
-(defcfun gcc-jit-context-new-string-literal gcc-jit-rvalue
-  (ctxt gcc-jit-context)
+(defcfun context-new-string-literal rvalue
+  (ctxt context)
   (value :string))
 
-(defcenum gcc-jit-unary-op
-  :minus
-  :bitwise-negate
-  :logical-negate
-  :abs)
+(defcenum unary-op
+  :unary-op-minus
+  :unary-op-bitwise-negate
+  :unary-op-logical-negate
+  :unary-op-abs)
 
-(defcfun gcc-jit-context-new-unary-op gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (op gcc-jit-unary-op)
-  (result-type gcc-jit-type)
-  (rvalue gcc-jit-rvalue))
+(defcfun context-new-unary-op rvalue
+  (ctxt context)
+  (loc location)
+  (op unary-op)
+  (result-type type)
+  (rvalue rvalue))
 
-(defcenum gcc-jit-binary-op
-  :plus
-  :minus
-  :mult
-  :divide
-  :modulo
-  :bitwise-and
-  :bitwise-xor
-  :bitwise-or
-  :logical-and
-  :lgoical-or
-  :lshift
-  :rshift)
+(defcenum binary-op
+  :binary-op-plus
+  :binary-op-minus
+  :binary-op-mult
+  :binary-op-divide
+  :binary-op-modulo
+  :binary-op-bitwise-and
+  :binary-op-bitwise-xor
+  :binary-op-bitwise-or
+  :binary-op-logical-and
+  :binary-op-lgoical-or
+  :binary-op-lshift
+  :binary-op-rshift)
 
-(defcfun gcc-jit-context-new-binary-op gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (op gcc-jit-binary-op)
-  (result-type gcc-jit-type)
-  (a gcc-jit-rvalue)
-  (b gcc-jit-rvalue))
+(defcfun context-new-binary-op rvalue
+  (ctxt context)
+  (loc location)
+  (op binary-op)
+  (result-type type)
+  (a rvalue)
+  (b rvalue))
 
-(defcenum gcc-jit-comparison
-  :eq
-  :ne
-  :lt
-  :le
-  :gt
-  :ge)
+(defcenum comparison
+  :comparison-eq
+  :comparison-ne
+  :comparison-lt
+  :comparison-le
+  :comparison-gt
+  :comparison-ge)
 
-(defcfun gcc-jit-context-new-comparison gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (op gcc-jit-comparison)
-  (a gcc-jit-rvalue)
-  (b gcc-jit-rvalue))
+(defcfun context-new-comparison rvalue
+  (ctxt context)
+  (loc location)
+  (op comparison)
+  (a rvalue)
+  (b rvalue))
 
-(defcfun gcc-jit-context-new-call gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (fn-ptr gcc-jit-rvalue)
+(defcfun context-new-call rvalue
+  (ctxt context)
+  (loc location)
+  (fn-ptr rvalue)
   (numargs :int)
-  (args (:pointer gcc-jit-rvalue)))
+  (args (:pointer rvalue)))
 
-(defcfun gcc-jit-context-new-call-through-ptr gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (fn-ptr gcc-jit-rvalue)
+(defcfun context-new-call-through-ptr rvalue
+  (ctxt context)
+  (loc location)
+  (fn-ptr rvalue)
   (numargs :int)
-  (args (:pointer gcc-jit-rvalue)))
+  (args (:pointer rvalue)))
 
-(defcfun gcc-jit-context-new-cast gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (value gcc-jit-rvalue)
-  (type gcc-jit-type))
+(defcfun context-new-cast rvalue
+  (ctxt context)
+  (loc location)
+  (value rvalue)
+  (type type))
 
-;#+gcc-jit-context-new-bitcast
-(defcfun gcc-jit-context-new-bitcast gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (value gcc-jit-rvalue)
-  (type gcc-jit-type))
+;#+context-new-bitcast
+(defcfun context-new-bitcast rvalue
+  (ctxt context)
+  (loc location)
+  (value rvalue)
+  (type type))
 
-;;#+gcc-jit-alignment
-(defcfun gcc-jit-lvalue-set-alignment :void
-  (lvalue gcc-jit-lvalue)
+;;#+alignment
+(defcfun lvalue-set-alignment :void
+  (lvalue lvalue)
   (bytes :unsigned-int))
 
-(defcfun gcc-jit-lvalue-get-alignment :unsigned-int
-  (lvalue gcc-jit-lvalue))
+(defcfun lvalue-get-alignment :unsigned-int
+  (lvalue lvalue))
 
-(defcfun gcc-jit-context-new-array-access gcc-jit-lvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (ptr gcc-jit-rvalue)
-  (index gcc-jit-rvalue))
+(defcfun context-new-array-access lvalue
+  (ctxt context)
+  (loc location)
+  (ptr rvalue)
+  (index rvalue))
 
-;#+gcc-jit-context-convert-vector
-(defcfun gcc-jit-context-convert-vector gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (vector gcc-jit-rvalue)
-  (type gcc-jit-type))
+;#+context-convert-vector
+(defcfun context-convert-vector rvalue
+  (ctxt context)
+  (loc location)
+  (vector rvalue)
+  (type type))
 
-;#+gcc-jit-vector-operations
-(defcfun gcc-jit-context-new-rvalue-vector-perm gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (elements1 gcc-jit-rvalue)
-  (elements2 gcc-jit-rvalue)
-  (mask gcc-jit-rvalue))
+;#+vector-operations
+(defcfun context-new-rvalue-vector-perm rvalue
+  (ctxt context)
+  (loc location)
+  (elements1 rvalue)
+  (elements2 rvalue)
+  (mask rvalue))
 
-;#+gcc-jit-vector-operations
-(defcfun gcc-jit-context-new-vector-access gcc-jit-lvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (vector gcc-jit-rvalue)
-  (index gcc-jit-rvalue))
+;#+vector-operations
+(defcfun context-new-vector-access lvalue
+  (ctxt context)
+  (loc location)
+  (vector rvalue)
+  (index rvalue))
 
-(defcfun gcc-jit-lvalue-access-field gcc-jit-lvalue
-  (struct-or-union gcc-jit-lvalue)
-  (loc gcc-jit-location)
-  (field gcc-jit-field))
+(defcfun lvalue-access-field lvalue
+  (struct-or-union lvalue)
+  (loc location)
+  (field field))
 
-(defcfun gcc-jit-rvalue-access-field gcc-jit-rvalue
-  (struct-or-union gcc-jit-rvalue)
-  (loc gcc-jit-location)
-  (field gcc-jit-field))
+(defcfun rvalue-access-field rvalue
+  (struct-or-union rvalue)
+  (loc location)
+  (field field))
 
-(defcfun gcc-jit-rvalue-dereference-field gcc-jit-lvalue
-  (ptr gcc-jit-rvalue)
-  (loc gcc-jit-location)
-  (field gcc-jit-field))
+(defcfun rvalue-dereference-field lvalue
+  (ptr rvalue)
+  (loc location)
+  (field field))
 
-(defcfun gcc-jit-rvalue-dereference gcc-jit-lvalue
-  (rvalue gcc-jit-rvalue)
-  (loc gcc-jit-location))
+(defcfun rvalue-dereference lvalue
+  (rvalue rvalue)
+  (loc location))
 
-(defcfun gcc-jit-lvalue-get-address gcc-jit-rvalue
-  (lvalue gcc-jit-lvalue)
-  (loc gcc-jit-location))
+(defcfun lvalue-get-address rvalue
+  (lvalue lvalue)
+  (loc location))
 
-;#+gcc-jit-lvalue-set-tls-model
-(defcfun gcc-jit-lvalue-set-tls-model :void
-  (lvalue gcc-jit-lvalue)
-  (model gcc-jit-tls-model))
+;#+lvalue-set-tls-model
+(defcfun lvalue-set-tls-model :void
+  (lvalue lvalue)
+  (model tls-model))
 
-;#+gcc-jit-lvalue-set-link-section
-(defcfun gcc-jit-lvalue-set-link-section :void
-  (lvalue gcc-jit-lvalue)
+;#+lvalue-set-link-section
+(defcfun lvalue-set-link-section :void
+  (lvalue lvalue)
   (section-name :string))
 
-;#+gcc-jit-lvalue-set-register-name
-(defcfun gcc-jit-lvalue-set-register-name :void
-  (lvalue gcc-jit-lvalue)
+;#+lvalue-set-register-name
+(defcfun lvalue-set-register-name :void
+  (lvalue lvalue)
   (reg-name :string))
 
-(defcfun gcc-jit-function-new-local gcc-jit-lvalue
-  (func gcc-jit-function)
-  (loc gcc-jit-location)
-  (type gcc-jit-type)
+(defcfun function-new-local lvalue
+  (func function)
+  (loc location)
+  (type type)
   (name :string))
 
-(defcfun gcc-jit-function-new-temp gcc-jit-lvalue
-  (func gcc-jit-function)
-  (loc gcc-jit-location)
-  (type gcc-jit-type))
+(defcfun function-new-temp lvalue
+  (func function)
+  (loc location)
+  (type type))
 
 ;;; Statement creation
-(defcfun gcc-jit-block-add-eval :void
-  (block_ gcc-jit-block)
-  (loc gcc-jit-location)
-  (rvalue gcc-jit-rvalue))
+(defcfun block-add-eval :void
+  (block_ block)
+  (loc location)
+  (rvalue rvalue))
 
-(defcfun gcc-jit-block-add-assignment :void
-  (block_ gcc-jit-block)
-  (loc gcc-jit-location)
-  (lvalue gcc-jit-lvalue)
-  (rvalue gcc-jit-rvalue))
+(defcfun block-add-assignment :void
+  (block_ block)
+  (loc location)
+  (lvalue lvalue)
+  (rvalue rvalue))
 
-(defcfun gcc-jit-block-add-assignment-op :void
-  (block_ gcc-jit-block)
-  (loc gcc-jit-location)
-  (lvalue gcc-jit-lvalue)
-  (op gcc-jit-binary-op)
-  (rvalue gcc-jit-rvalue))
+(defcfun block-add-assignment-op :void
+  (block_ block)
+  (loc location)
+  (lvalue lvalue)
+  (op binary-op)
+  (rvalue rvalue))
 
-(defcfun gcc-jit-block-add-comment :void
-  (block_ gcc-jit-block)
-  (loc gcc-jit-location)
+(defcfun block-add-comment :void
+  (block_ block)
+  (loc location)
   (text :string))
 
-(defcfun gcc-jit-block-end-with-conditional :void
-  (block_ gcc-jit-block)
-  (loc gcc-jit-location)
-  (boolval gcc-jit-rvalue)
-  (on-true gcc-jit-block)
-  (on-false gcc-jit-block))
+(defcfun block-end-with-conditional :void
+  (block_ block)
+  (loc location)
+  (boolval rvalue)
+  (on-true block)
+  (on-false block))
 
-(defcfun gcc-jit-block-end-with-jump :void
-  (block_ gcc-jit-block)
-  (loc gcc-jit-location)
-  (target gcc-jit-block))
+(defcfun block-end-with-jump :void
+  (block_ block)
+  (loc location)
+  (target block))
 
-(defcfun gcc-jit-block-end-with-return :void
-  (block_ gcc-jit-block)
-  (loc gcc-jit-location)
-  (rvalue gcc-jit-rvalue))
+(defcfun block-end-with-return :void
+  (block_ block)
+  (loc location)
+  (rvalue rvalue))
 
-(defcfun gcc-jit-block-end-with-void-return :void
-  (block_ gcc-jit-block)
-  (loc gcc-jit-location))
+(defcfun block-end-with-void-return :void
+  (block_ block)
+  (loc location))
 
-;#+gcc-jit-switch-statements
-(defcfun gcc-jit-context-new-case gcc-jit-case
-  (ctxt gcc-jit-context)
-  (min-value gcc-jit-rvalue)
-  (max-value gcc-jit-rvalue)
-  (dest-block gcc-jit-block))
+;#+switch-statements
+(defcfun context-new-case case
+  (ctxt context)
+  (min-value rvalue)
+  (max-value rvalue)
+  (dest-block block))
 
-(defcfun gcc-jit-case-as-object gcc-jit-object
-  (case_ gcc-jit-case))
+(defcfun case-as-object object
+  (case_ case))
 
-(defcfun gcc-jit-block-end-with-switch :void
-  (block_ gcc-jit-block)
-  (loc gcc-jit-location)
-  (expr gcc-jit-rvalue)
-  (default-block gcc-jit-block)
+(defcfun block-end-with-switch :void
+  (block_ block)
+  (loc location)
+  (expr rvalue)
+  (default-block block)
   (num-cases :int)
-  (cases (:pointer gcc-jit-case)))
+  (cases (:pointer case)))
 
 ;;; Nested contexts
-(defcfun gcc-jit-context-new-child-context gcc-jit-context
-  (parent-ctxt gcc-jit-context))
+(defcfun context-new-child-context context
+  (parent-ctxt context))
 
-(defcfun gcc-jit-context-dump-reproducer-to-file :void
-  (ctxt gcc-jit-context)
+(defcfun context-dump-reproducer-to-file :void
+  (ctxt context)
   (path :string))
 
-(defcfun gcc-jit-context-enable-dump :void
-  (ctxt gcc-jit-context)
+(defcfun context-enable-dump :void
+  (ctxt context)
   (dumpname :string)
   (out-ptr (:pointer :string)))
 
 ;;; Timing support
-;#+gcc-jit-timing-api
-(defctype gcc-jit-timer :pointer)
+;#+timing-api
+(defctype timer :pointer)
 
-(defcfun gcc-jit-timer-new gcc-jit-timer)
+(defcfun timer-new timer)
 
-(defcfun gcc-jit-timer-release gcc-jit-timer
-  (timer gcc-jit-timer))
+(defcfun timer-release timer
+  (timer timer))
 
-(defcfun gcc-jit-context-set-timer :void
-  (ctxt gcc-jit-context)
-  (timer gcc-jit-timer))
+(defcfun context-set-timer :void
+  (ctxt context)
+  (timer timer))
 
-(defcfun gcc-jit-context-get-timer gcc-jit-timer
-  (ctxt gcc-jit-context))
+(defcfun context-get-timer timer
+  (ctxt context))
 
-(defcfun gcc-jit-timer-push :void
-  (timer gcc-jit-timer)
+(defcfun timer-push :void
+  (timer timer)
   (item-name :string))
 
-(defcfun gcc-jit-timer-pop :void
-  (timer gcc-jit-timer)
+(defcfun timer-pop :void
+  (timer timer)
   (item-name :string))
 
-(defcfun gcc-jit-timer-print :void
-  (timer gcc-jit-timer)
+(defcfun timer-print :void
+  (timer timer)
   (f-out :pointer))                     ; FILE *
 
-;#+gcc-jit-rvalue-set-bool-require-tail-call
-(defcfun gcc-jit-rvalue-set-bool-require-tail-call :void
-  (call gcc-jit-rvalue)
+;#+rvalue-set-bool-require-tail-call
+(defcfun rvalue-set-bool-require-tail-call :void
+  (call rvalue)
   (require-tail-call :int))
 
-;#+gcc-jit-type-get-aligned
-(defcfun gcc-jit-type-get-aligned gcc-jit-type
-  (type gcc-jit-type)
+;#+type-get-aligned
+(defcfun type-get-aligned type
+  (type type)
   (alignment-in-bytes :size))
 
-;#+gcc-jit-type-get-vector
-(defcfun gcc-jit-type-get-vector gcc-jit-type
-  (type gcc-jit-type)
+;#+type-get-vector
+(defcfun type-get-vector type
+  (type type)
   (num-units :size))
 
-;#+gcc-jit-function-get-address
-(defcfun gcc-jit-function-get-address gcc-jit-rvalue
-  (fn gcc-jit-function)
-  (loc gcc-jit-location))
+;#+function-get-address
+(defcfun function-get-address rvalue
+  (fn function)
+  (loc location))
 
-;#+gcc-jit-context-new-rvalue-from-vector
-(defcfun gcc-jit-context-new-rvalue-from-vector gcc-jit-rvalue
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
-  (vec-type gcc-jit-type)
+;#+context-new-rvalue-from-vector
+(defcfun context-new-rvalue-from-vector rvalue
+  (ctxt context)
+  (loc location)
+  (vec-type type)
   (num-elements :size)
-  (elements gcc-jit-rvalue))
+  (elements rvalue))
 
-;#+gcc-jit-version
-(defcfun gcc-jit-version-major :int)
+;#+version
+(defcfun version-major :int)
 
-(defcfun gcc-jit-version-minor :int)
+(defcfun version-minor :int)
 
-(defcfun gcc-jit-version-patchlevel :int)
+(defcfun version-patchlevel :int)
 
 ;;; Asm support
-;#+gcc-jit-asm-statements
-(defcfun gcc-jit-block-add-extended-asm gcc-jit-extended-asm
-  (block_ gcc-jit-block)
-  (loc gcc-jit-location)
+;#+asm-statements
+(defcfun block-add-extended-asm extended-asm
+  (block_ block)
+  (loc location)
   (asm-template :string))
 
-(defcfun gcc-jit-block-end-with-extended-asm-goto  gcc-jit-extended-asm
-  (block_ gcc-jit-block)
-  (loc gcc-jit-location)
+(defcfun block-end-with-extended-asm-goto  extended-asm
+  (block_ block)
+  (loc location)
   (asm-template :string)
   (num-goto-blocks :int)
-  (goto-blocks (:pointer gcc-jit-block))
-  (fallthrough-block gcc-jit-block))
+  (goto-blocks (:pointer block))
+  (fallthrough-block block))
 
-(defcfun gcc-jit-extended-asm-as-object gcc-jit-object
-  (ext-asm gcc-jit-extended-asm))
+(defcfun extended-asm-as-object object
+  (ext-asm extended-asm))
 
-(defcfun gcc-jit-extended-asm-set-volatile-flag :void
-  (ext-asm gcc-jit-extended-asm)
+(defcfun extended-asm-set-volatile-flag :void
+  (ext-asm extended-asm)
   (flag :int))
 
-(defcfun gcc-jit-extended-asm-set-inline-flag :void
-  (ext-asm gcc-jit-extended-asm)
+(defcfun extended-asm-set-inline-flag :void
+  (ext-asm extended-asm)
   (flag :int))
 
-(defcfun gcc-jit-extended-asm-add-output-operand :void
-  (ext-asm gcc-jit-extended-asm)
+(defcfun extended-asm-add-output-operand :void
+  (ext-asm extended-asm)
   (asm-symbolic-name :string)
   (constraint :string)
-  (dest gcc-jit-lvalue))
+  (dest lvalue))
 
-(defcfun gcc-jit-extended-asm-add-input-operand :void
-  (ext-asm gcc-jit-extended-asm)
+(defcfun extended-asm-add-input-operand :void
+  (ext-asm extended-asm)
   (asm-symbolic-name :string)
   (constraint :string)
-  (src gcc-jit-rvalue))
+  (src rvalue))
 
-(defcfun gcc-jit-extended-asm-add-clobber :void
-  (ext-asm gcc-jit-extended-asm)
+(defcfun extended-asm-add-clobber :void
+  (ext-asm extended-asm)
   (victim :string))
 
-(defcfun gcc-jit-add-top-level-asm :void
-  (ctxt gcc-jit-context)
-  (loc gcc-jit-location)
+(defcfun add-top-level-asm :void
+  (ctxt context)
+  (loc location)
   (asm-stmts :string))
 
-;#+gcc-jit-reflection
-(defcfun gcc-jit-function-get-return-type gcc-jit-type
-  (func gcc-jit-function))
+;#+reflection
+(defcfun function-get-return-type type
+  (func function))
 
-(defcfun gcc-jit-function-get-param-count :size
-  (func gcc-jit-function))
+(defcfun function-get-param-count :size
+  (func function))
 
-(defcfun gcc-jit-type-dyncast-array gcc-jit-type
-  (type gcc-jit-type))
+(defcfun type-dyncast-array type
+  (type type))
 
-(defcfun gcc-jit-type-is-bool :int
-  (type gcc-jit-type))
+(defcfun type-is-bool :int
+  (type type))
 
-(defcfun gcc-jit-type-dyncast-function-ptr-type gcc-jit-function-type
-  (type gcc-jit-type))
+(defcfun type-dyncast-function-ptr-type function-type
+  (type type))
 
-(defcfun gcc-jit-function-type-get-return-type gcc-jit-type
-  (function-type gcc-jit-function-type))
+(defcfun function-type-get-return-type type
+  (function-type function-type))
 
-(defcfun gcc-jit-function-type-get-param-count :size
-  (function-type gcc-jit-function-type))
+(defcfun function-type-get-param-count :size
+  (function-type function-type))
 
-(defcfun gcc-jit-function-type-get-param-type gcc-jit-type
-  (function-type gcc-jit-function-type)
+(defcfun function-type-get-param-type type
+  (function-type function-type)
   (index :size))
 
-(defcfun gcc-jit-type-is-integral :int
-  (type gcc-jit-type))
+(defcfun type-is-integral :int
+  (type type))
 
-(defcfun gcc-jit-type-is-pointer gcc-jit-type
-  (type gcc-jit-type))
+(defcfun type-is-pointer type
+  (type type))
 
-(defcfun gcc-jit-type-dyncast-vector gcc-jit-vector-type
-  (type gcc-jit-type))
+(defcfun type-dyncast-vector vector-type
+  (type type))
 
-(defcfun gcc-jit-type-is-struct gcc-jit-struct
-  (type gcc-jit-type))
+(defcfun type-is-struct struct
+  (type type))
 
-(defcfun gcc-jit-vector-type-get-num-units :size
-  (vector-type gcc-jit-vector-type))
+(defcfun vector-type-get-num-units :size
+  (vector-type vector-type))
 
-(defcfun gcc-jit-vector-type-get-element-type gcc-jit-type
-  (vector-type gcc-jit-vector-type))
+(defcfun vector-type-get-element-type type
+  (vector-type vector-type))
 
-(defcfun gcc-jit-type-unqualified gcc-jit-type
-  (type gcc-jit-type))
+(defcfun type-unqualified type
+  (type type))
 
-(defcenum gcc-jit-fn-attribute
-  :alias
-  :always-inline
-  :inline
-  :noinline
-  :target
-  :used
-  :visibility
-  :cold
-  :returns-twice
-  :pure
-  :const
-  :weak
-  :nonnull
-  :max                                  ; just for indicate the maximum value of this enum
+(defcenum fn-attribute
+  :fn-attribute-alias
+  :fn-attribute-always-inline
+  :fn-attribute-inline
+  :fn-attribute-noinline
+  :fn-attribute-target
+  :fn-attribute-used
+  :fn-attribute-visibility
+  :fn-attribute-cold
+  :fn-attribute-returns-twice
+  :fn-attribute-pure
+  :fn-attribute-const
+  :fn-attribute-weak
+  :fn-attribute-nonnull
+  :fn-attribute-max                                  ; just for indicate the maximum value of this enum
   )
 
-(defcfun gcc-jit-funciton-add-attribute :void
-  (func gcc-jit-function)
-  (attribute gcc-jit-fn-attribute))
+(defcfun funciton-add-attribute :void
+  (func function)
+  (attribute fn-attribute))
 
-(defcfun gcc-jit-function-add-string-attribute :void
-  (func gcc-jit-function)
-  (attribute gcc-jit-fn-attribute)
+(defcfun function-add-string-attribute :void
+  (func function)
+  (attribute fn-attribute)
   (value :string))
 
-(defcfun gcc-jit-function-add-integer-array-attribute :void
-  (func gcc-jit-function)
-  (attribute gcc-jit-fn-attribute)
+(defcfun function-add-integer-array-attribute :void
+  (func function)
+  (attribute fn-attribute)
   (value (:pointer :int))
   (length :size))
 
-(defcenum gcc-jit-variable-attribute
-  :visibility
-  :max)
+(defcenum variable-attribute
+  :variable-attribute-visibility
+  :variable-attribute-max)
 
-(defcfun gcc-jit-lvalue-add-string-attribute :void
-  (variable gcc-jit-lvalue)
-  (attribute gcc-jit-variable-attribute)
+(defcfun lvalue-add-string-attribute :void
+  (variable lvalue)
+  (attribute variable-attribute)
   (value :string))
 
-;#+gcc-jit-context-set-output-ident
-(defcfun gcc-jit-context-set-output-ident :void
-  (ctxt gcc-jit-context)
+;#+context-set-output-ident
+(defcfun context-set-output-ident :void
+  (ctxt context)
   (output-ident :string))
