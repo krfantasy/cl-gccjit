@@ -428,7 +428,7 @@
   (lvalue lvalue))
 
 (defcfun lvalue-as-rvalue rvalue
-  (rvalue lvalue))
+  (lvalue lvalue))
 
 (defcfun rvalue-as-object object
   (rvalue rvalue))
