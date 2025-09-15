@@ -25,7 +25,7 @@
                     (gccjit-ffi:param-as-rvalue param-i))))
         (gccjit-ffi:block-end-with-return block% (cffi:null-pointer) expr)))))
 
-
+#|
 (let ((ctxt (gccjit-ffi:context-acquire)))
   (gccjit-ffi:context-set-bool-option ctxt :bool-option-dump-generated-code 0)
   (create-code ctxt)
@@ -34,3 +34,4 @@
     (let ((fnptr (gccjit-ffi:result-get-code result "square")))
       (format t "square(5) = ~a~%" (cffi:foreign-funcall-pointer fnptr () :int 5 :int)))
     (gccjit-ffi:result-release result)))
+|#

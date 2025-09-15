@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push
+  pull_request
+
+jobs:
+  run-tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install libgccjit (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y libgccjit-dev
+
+      - name: Install libgccjit (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install gcc
+
+      - name: Setup
+        uses: 40ants/setup-lisp@v4
+        with:
+          asdf-system: cl-gccjit
+          cache: true
+          qlfile-template: |
+            dist ultralisp http://dist.ultralisp.org
+
+      - name: Run tests
+        uses: 40ants/run-tests@v2
+        with:
+          asdf-system: cl-gccjit
