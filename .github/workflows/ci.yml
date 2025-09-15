@@ -1,27 +1,40 @@
 name: CI
 
 on:
-  push
-  pull_request
+  - push
+  - pull_request
 
 jobs:
   run-tests:
-    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      OS: ${{ matrix.os }}
+      LISP: sbcl-bin
+      QUICKLISP_DIST: ultralisp
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
       - name: Install libgccjit (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install -y libgccjit-dev
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libgccjit-14-dev libgccjit0
+          version: 1.0
 
       - name: Install libgccjit (macOS)
-        if: matrix.os == 'macos-latest'
-        run: brew install gcc
+        if: ${{ matrix.os == 'macos-latest' }}
+        uses: tecolicom/actions-use-homebrew-tools@v1
+        with:
+          tools: libgccjit gcc
+          cache: yes
 
       - name: Setup
         uses: 40ants/setup-lisp@v4
