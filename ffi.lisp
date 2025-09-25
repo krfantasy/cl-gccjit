@@ -20,9 +20,9 @@
 (defctype extended-asm :pointer)
 
 ;;; Context
-(defcfun context-acquire context)
+(defcfun-debug-logging context-acquire context)
 
-(defcfun context-release :void
+(defcfun-debug-logging context-release :void
   (ctxt context))
 
 (defcenum str-option
@@ -45,47 +45,47 @@
   :bool-option-keep-intermediates
   :num-bool-options)
 
-(defcfun context-set-str-option :void
+(defcfun-debug-logging context-set-str-option :void
   (ctxt context)
   (opt str-option)
   (value :string))
 
-(defcfun context-set-int-option :void
+(defcfun-debug-logging context-set-int-option :void
   (ctxt context)
   (opt int-option)
   (value :int))
 
-(defcfun context-set-bool-option :void
+(defcfun-debug-logging context-set-bool-option :void
   (ctxt context)
   (opt bool-option)
   (value :int))
 
 ;#+allow-unreachable-blocks
-(defcfun context-set-bool-allow-unreachable-blocks :void
+(defcfun-debug-logging context-set-bool-allow-unreachable-blocks :void
   (ctxt context)
   (bool-value :int))
 
 ;#+print-errors-to-stderr
-(defcfun context-set-bool-print-errors-to-stderr :void
+(defcfun-debug-logging context-set-bool-print-errors-to-stderr :void
   (ctxt context)
   (enabled :int))
 
 ;#+use-external-driver
-(defcfun context-set-bool-use-external-driver :void
+(defcfun-debug-logging context-set-bool-use-external-driver :void
   (ctxt context)
   (bool-value :int))
 
 ;#+command-line-option
-(defcfun context-add-command-line-option :void
+(defcfun-debug-logging context-add-command-line-option :void
   (ctxt context)
   (optname :string))
 
 ;#+driver-option
-(defcfun context-add-driver-option :void
+(defcfun-debug-logging context-add-driver-option :void
   (ctxt context)
   (optname :string))
 
-(defcfun context-compile result
+(defcfun-debug-logging context-compile result
   (ctxt context))
 
 (defcenum output-kind
@@ -94,58 +94,58 @@
   :output-kind-dynamic-library
   :output-kind-executable)
 
-(defcfun context-compile-to-file :void
+(defcfun-debug-logging context-compile-to-file :void
   (ctxt context)
   (output-kind output-kind)
   (output-path :string))
 
-(defcfun context-dump-to-file :void
+(defcfun-debug-logging context-dump-to-file :void
   (ctxt context)
   (path :string)
   (update-locations :int))
 
-(defcfun context-set-logfile :void
+(defcfun-debug-logging context-set-logfile :void
   (ctxt context)
   (logfile :pointer)
   (flags :int)
   (verbosity :int))
 
-(defcfun context-get-first-error :string
+(defcfun-debug-logging context-get-first-error :string
   (ctxt context))
 
-(defcfun context-get-last-error :string
+(defcfun-debug-logging context-get-last-error :string
   (ctxt context))
 
-(defcfun result-get-code :pointer
+(defcfun-debug-logging result-get-code :pointer
   (result result)
   (funcname :string))
 
-(defcfun result-get-global :pointer
+(defcfun-debug-logging result-get-global :pointer
   (result result)
   (name :string))
 
-(defcfun result-release :void
+(defcfun-debug-logging result-release :void
   (result result))
 
 ;;; Objects
-(defcfun object-get-context context
+(defcfun-debug-logging object-get-context context
   (obj object))
 
-(defcfun object-get-debug-string :string
+(defcfun-debug-logging object-get-debug-string :string
   (obj object))
 
 ;;; Debugging information
-(defcfun context-new-location location
+(defcfun-debug-logging context-new-location location
   (ctxt context)
   (filename :string)
   (line :int)
   (column :int))
 
-(defcfun location-as-object object
+(defcfun-debug-logging location-as-object object
   (loc location))
 
 ;;; Types
-(defcfun type-as-object object
+(defcfun-debug-logging type-as-object object
   (type type))
 
 (defcenum types
@@ -203,97 +203,97 @@
 
   :type-bfloat16)
 
-(defcfun context-get-type type
+(defcfun-debug-logging context-get-type type
   (ctxt context)
   (type types))
 
-(defcfun context-get-int-type type
+(defcfun-debug-logging context-get-int-type type
   (ctxt context)
   (num-bytes :int)
   (is-signed :int))
 
-(defcfun type-get-pointer type
+(defcfun-debug-logging type-get-pointer type
   (type type))
 
-(defcfun type-get-const type
+(defcfun-debug-logging type-get-const type
   (type type))
 
 
-(defcfun type-get-volatile type
+(defcfun-debug-logging type-get-volatile type
   (type type))
 
 ;#+type-get-restrict
-(defcfun type-get-restrict type
+(defcfun-debug-logging type-get-restrict type
   (type type))
 
 ;#+sized-integers
-(defcfun compatible-types :int
+(defcfun-debug-logging compatible-types :int
   (ltype type)
   (rtype type))
 
 ;#+sized-integers
-(defcfun type-get-size :ssize
+(defcfun-debug-logging type-get-size :ssize
   (type type))
 
-(defcfun context-new-array-type type
+(defcfun-debug-logging context-new-array-type type
   (ctxt context)
   (loc location)
   (element-type type)
   (num-elements :int))
 
-(defcfun context-new-field field
+(defcfun-debug-logging context-new-field field
   (ctxt context)
   (loc location)
   (type type)
   (name :string))
 
 ;#+context-new-bitfield
-(defcfun context-new-bitfield field
+(defcfun-debug-logging context-new-bitfield field
   (ctxt context)
   (loc location)
   (type type)
   (width :int)
   (name :string))
 
-(defcfun field-as-object object
+(defcfun-debug-logging field-as-object object
   (field field))
 
-(defcfun context-new-struct-type struct
+(defcfun-debug-logging context-new-struct-type struct
   (ctxt context)
   (loc location)
   (name :string)
   (num-fields :int)
   (fields (:pointer field)))
 
-(defcfun context-new-opaque-struct struct
+(defcfun-debug-logging context-new-opaque-struct struct
   (ctxt context)
   (loc location)
   (name :string))
 
-(defcfun struct-as-type type
+(defcfun-debug-logging struct-as-type type
   (struct-type struct))
 
-(defcfun struct-set-fields struct
+(defcfun-debug-logging struct-set-fields struct
   (struct-type struct)
   (loc location)
   (num-fields :int)
   (fields (:pointer field)))
 
-(defcfun struct-get-field field
+(defcfun-debug-logging struct-get-field field
   (struct-type struct)
   (index :size))
 
-(defcfun struct-get-field-count :size
+(defcfun-debug-logging struct-get-field-count :size
   (struct-type struct))
 
-(defcfun context-new-union-type type
+(defcfun-debug-logging context-new-union-type type
   (ctxt context)
   (loc location)
   (name :string)
   (num-fields :int)
   (fields (:pointer field)))
 
-(defcfun context-new-funciton-ptr-type type
+(defcfun-debug-logging context-new-funciton-ptr-type type
   (ctxt context)
   (loc location)
   (return-type type)
@@ -302,19 +302,19 @@
   (is-variadic :int))
 
 ;;; Constructing functions
-(defcfun context-new-param param
+(defcfun-debug-logging context-new-param param
   (ctxt context)
   (loc location)
   (type type)
   (name :string))
 
-(defcfun param-as-object object
+(defcfun-debug-logging param-as-object object
   (param param))
 
-(defcfun param-as-lvalue lvalue
+(defcfun-debug-logging param-as-lvalue lvalue
   (param param))
 
-(defcfun param-as-rvalue rvalue
+(defcfun-debug-logging param-as-rvalue rvalue
   (param param))
 
 (defcenum function-kind
@@ -330,7 +330,7 @@
   :tls-model-initial-exec
   :tls-model-local-exec)
 
-(defcfun context-new-function function
+(defcfun-debug-logging context-new-function function
   (ctxt context)
   (loc location)
   (kind function-kind)
@@ -340,30 +340,30 @@
   (params (:pointer param))
   (is-variadic :int))
 
-(defcfun context-get-builtin-function function
+(defcfun-debug-logging context-get-builtin-function function
   (ctxt context)
   (name :string))
 
-(defcfun function-as-object object
+(defcfun-debug-logging function-as-object object
   (func function))
 
-(defcfun function-get-param param
+(defcfun-debug-logging function-get-param param
   (func function)
   (index :int))
 
-(defcfun function-dump-to-dot :void
+(defcfun-debug-logging function-dump-to-dot :void
   (func function)
   (path :string))
 
 ;;; Block
-(defcfun function-new-block block
+(defcfun-debug-logging function-new-block block
   (func function)
   (name :string))
 
-(defcfun block-as-object object
+(defcfun-debug-logging block-as-object object
   (block_ block))
 
-(defcfun block-get-function function
+(defcfun-debug-logging block-get-function function
   (block_ block))
 
 ;;; lvalues, rvalues and expressions
@@ -372,7 +372,7 @@
   :global-kind-internal
   :global-kind-imported)
 
-(defcfun context-new-global lvalue
+(defcfun-debug-logging context-new-global lvalue
   (ctxt context)
   (loc location)
   (kind global-kind)
@@ -380,7 +380,7 @@
   (name :string))
 
 ;#+ctors
-(defcfun context-new-struct-constructor rvalue
+(defcfun-debug-logging context-new-struct-constructor rvalue
   (ctxt context)
   (loc location)
   (type type)
@@ -389,7 +389,7 @@
   (values (:pointer rvalue)))
 
 ;#+ctors
-(defcfun context-new-union-constructor rvalue
+(defcfun-debug-logging context-new-union-constructor rvalue
   (ctxt context)
   (loc location)
   (type type)
@@ -397,7 +397,7 @@
   (value rvalue))
 
 ;#+ctors
-(defcfun context-new-array-constructor rvalue
+(defcfun-debug-logging context-new-array-constructor rvalue
   (ctxt context)
   (loc location)
   (type type)
@@ -405,79 +405,79 @@
   (values (:pointer rvalue)))
 
 ;#+ctors
-(defcfun global-set-initializer-rvalue lvalue
+(defcfun-debug-logging global-set-initializer-rvalue lvalue
   (ctxt lvalue)
   (init-value rvalue))
 
 ;#+get-target-builtin-function
-(defcfun context-get-target-builtin-funciton function
+(defcfun-debug-logging context-get-target-builtin-funciton function
   (ctxt context)
   (name :string))
 
 ;#+global-set-initializer
-(defcfun global-set-initializer lvalue
+(defcfun-debug-logging global-set-initializer lvalue
   (global lvalue)
   (blob :pointer)
   (num-bytes :size))
 
 ;#+global-set-readonly
-(defcfun global-set-randomly :void
+(defcfun-debug-logging global-set-randomly :void
   (global lvalue))
 
-(defcfun lvalue-as-object object
+(defcfun-debug-logging lvalue-as-object object
   (lvalue lvalue))
 
-(defcfun lvalue-as-rvalue rvalue
+(defcfun-debug-logging lvalue-as-rvalue rvalue
   (lvalue lvalue))
 
-(defcfun rvalue-as-object object
+(defcfun-debug-logging rvalue-as-object object
   (rvalue rvalue))
 
-(defcfun rvalue-get-type type
+(defcfun-debug-logging rvalue-get-type type
   (rvalue rvalue))
 
-(defcfun context-new-rvalue-from-int rvalue
+(defcfun-debug-logging context-new-rvalue-from-int rvalue
   (ctxt context)
   (numeric-type type)
   (value :int))
 
-(defcfun context-new-rvalue-from-long rvalue
+(defcfun-debug-logging context-new-rvalue-from-long rvalue
   (ctxt context)
   (numeric-type type)
   (value :long))
 
-(defcfun context-zero rvalue
+(defcfun-debug-logging context-zero rvalue
   (ctxt context)
   (numeric-type type))
 
-(defcfun context-one rvalue
+(defcfun-debug-logging context-one rvalue
   (ctxt context)
   (numeric-type type))
 
-(defcfun context-new-rvalue-from-double rvalue
+(defcfun-debug-logging context-new-rvalue-from-double rvalue
   (ctxt context)
   (numeric-type type)
   (value :double))
 
-(defcfun context-new-rvalue-from-ptr rvalue
+(defcfun-debug-logging context-new-rvalue-from-ptr rvalue
   (ctxt context)
   (pointer-type type)
   (value :pointer))
 
-(defcfun context-null rvalue
+(defcfun-debug-logging context-null rvalue
   (ctxt context))
 
 ;#+context-new-sizeof
-(defcfun context-new-sizeof rvalue
+(defcfun-debug-logging context-new-sizeof rvalue
   (ctxt context)
   (type type))
 
 ;#+context-new-alignof
-(defcfun context-new-alignof rvalue
+(defcfun-debug-logging context-new-alignof rvalue
   (ctxt context)
   (type type))
 
-(defcfun context-new-string-literal rvalue
+(defcfun-debug-logging context-new-string-literal rvalue
   (ctxt context)
   (value :string))
 
@@ -487,7 +487,7 @@
   :unary-op-logical-negate
   :unary-op-abs)
 
-(defcfun context-new-unary-op rvalue
+(defcfun-debug-logging context-new-unary-op rvalue
   (ctxt context)
   (loc location)
   (op unary-op)
@@ -508,7 +508,7 @@
   :binary-op-lshift
   :binary-op-rshift)
 
-(defcfun context-new-binary-op rvalue
+(defcfun-debug-logging context-new-binary-op rvalue
   (ctxt context)
   (loc location)
   (op binary-op)
@@ -524,63 +524,63 @@
   :comparison-gt
   :comparison-ge)
 
-(defcfun context-new-comparison rvalue
+(defcfun-debug-logging context-new-comparison rvalue
   (ctxt context)
   (loc location)
   (op comparison)
   (a rvalue)
   (b rvalue))
 
-(defcfun context-new-call rvalue
+(defcfun-debug-logging context-new-call rvalue
   (ctxt context)
   (loc location)
   (fn-ptr rvalue)
   (numargs :int)
   (args (:pointer rvalue)))
 
-(defcfun context-new-call-through-ptr rvalue
+(defcfun-debug-logging context-new-call-through-ptr rvalue
   (ctxt context)
   (loc location)
   (fn-ptr rvalue)
   (numargs :int)
   (args (:pointer rvalue)))
 
-(defcfun context-new-cast rvalue
+(defcfun-debug-logging context-new-cast rvalue
   (ctxt context)
   (loc location)
   (value rvalue)
   (type type))
 
 ;#+context-new-bitcast
-(defcfun context-new-bitcast rvalue
+(defcfun-debug-logging context-new-bitcast rvalue
   (ctxt context)
   (loc location)
   (value rvalue)
   (type type))
 
 ;;#+alignment
-(defcfun lvalue-set-alignment :void
+(defcfun-debug-logging lvalue-set-alignment :void
   (lvalue lvalue)
   (bytes :unsigned-int))
 
-(defcfun lvalue-get-alignment :unsigned-int
+(defcfun-debug-logging lvalue-get-alignment :unsigned-int
   (lvalue lvalue))
 
-(defcfun context-new-array-access lvalue
+(defcfun-debug-logging context-new-array-access lvalue
   (ctxt context)
   (loc location)
   (ptr rvalue)
   (index rvalue))
 
 ;#+context-convert-vector
-(defcfun context-convert-vector rvalue
+(defcfun-debug-logging context-convert-vector rvalue
   (ctxt context)
   (loc location)
   (vector rvalue)
   (type type))
 
 ;#+vector-operations
-(defcfun context-new-rvalue-vector-perm rvalue
+(defcfun-debug-logging context-new-rvalue-vector-perm rvalue
   (ctxt context)
   (loc location)
   (elements1 rvalue)
@@ -588,117 +588,117 @@
   (mask rvalue))
 
 ;#+vector-operations
-(defcfun context-new-vector-access lvalue
+(defcfun-debug-logging context-new-vector-access lvalue
   (ctxt context)
   (loc location)
   (vector rvalue)
   (index rvalue))
 
-(defcfun lvalue-access-field lvalue
+(defcfun-debug-logging lvalue-access-field lvalue
   (struct-or-union lvalue)
   (loc location)
   (field field))
 
-(defcfun rvalue-access-field rvalue
+(defcfun-debug-logging rvalue-access-field rvalue
   (struct-or-union rvalue)
   (loc location)
   (field field))
 
-(defcfun rvalue-dereference-field lvalue
+(defcfun-debug-logging rvalue-dereference-field lvalue
   (ptr rvalue)
   (loc location)
   (field field))
 
-(defcfun rvalue-dereference lvalue
+(defcfun-debug-logging rvalue-dereference lvalue
   (rvalue rvalue)
   (loc location))
 
-(defcfun lvalue-get-address rvalue
+(defcfun-debug-logging lvalue-get-address rvalue
   (lvalue lvalue)
   (loc location))
 
 ;#+lvalue-set-tls-model
-(defcfun lvalue-set-tls-model :void
+(defcfun-debug-logging lvalue-set-tls-model :void
   (lvalue lvalue)
   (model tls-model))
 
 ;#+lvalue-set-link-section
-(defcfun lvalue-set-link-section :void
+(defcfun-debug-logging lvalue-set-link-section :void
   (lvalue lvalue)
   (section-name :string))
 
 ;#+lvalue-set-register-name
-(defcfun lvalue-set-register-name :void
+(defcfun-debug-logging lvalue-set-register-name :void
   (lvalue lvalue)
   (reg-name :string))
 
-(defcfun function-new-local lvalue
+(defcfun-debug-logging function-new-local lvalue
   (func function)
   (loc location)
   (type type)
   (name :string))
 
-(defcfun function-new-temp lvalue
+(defcfun-debug-logging function-new-temp lvalue
   (func function)
   (loc location)
   (type type))
 
 ;;; Statement creation
-(defcfun block-add-eval :void
+(defcfun-debug-logging block-add-eval :void
   (block_ block)
   (loc location)
   (rvalue rvalue))
 
-(defcfun block-add-assignment :void
+(defcfun-debug-logging block-add-assignment :void
   (block_ block)
   (loc location)
   (lvalue lvalue)
   (rvalue rvalue))
 
-(defcfun block-add-assignment-op :void
+(defcfun-debug-logging block-add-assignment-op :void
   (block_ block)
   (loc location)
   (lvalue lvalue)
   (op binary-op)
   (rvalue rvalue))
 
-(defcfun block-add-comment :void
+(defcfun-debug-logging block-add-comment :void
   (block_ block)
   (loc location)
   (text :string))
 
-(defcfun block-end-with-conditional :void
+(defcfun-debug-logging block-end-with-conditional :void
   (block_ block)
   (loc location)
   (boolval rvalue)
   (on-true block)
   (on-false block))
 
-(defcfun block-end-with-jump :void
+(defcfun-debug-logging block-end-with-jump :void
   (block_ block)
   (loc location)
   (target block))
 
-(defcfun block-end-with-return :void
+(defcfun-debug-logging block-end-with-return :void
   (block_ block)
   (loc location)
   (rvalue rvalue))
 
-(defcfun block-end-with-void-return :void
+(defcfun-debug-logging block-end-with-void-return :void
   (block_ block)
   (loc location))
 
 ;#+switch-statements
-(defcfun context-new-case case
+(defcfun-debug-logging context-new-case case
   (ctxt context)
   (min-value rvalue)
   (max-value rvalue)
   (dest-block block))
 
-(defcfun case-as-object object
+(defcfun-debug-logging case-as-object object
   (case_ case))
 
-(defcfun block-end-with-switch :void
+(defcfun-debug-logging block-end-with-switch :void
   (block_ block)
   (loc location)
   (expr rvalue)
@@ -707,14 +707,14 @@
   (cases (:pointer case)))
 
 ;;; Nested contexts
-(defcfun context-new-child-context context
+(defcfun-debug-logging context-new-child-context context
   (parent-ctxt context))
 
-(defcfun context-dump-reproducer-to-file :void
+(defcfun-debug-logging context-dump-reproducer-to-file :void
   (ctxt context)
   (path :string))
 
-(defcfun context-enable-dump :void
+(defcfun-debug-logging context-enable-dump :void
   (ctxt context)
   (dumpname :string)
   (out-ptr (:pointer :string)))
@@ -723,52 +723,52 @@
 ;#+timing-api
 (defctype timer :pointer)
 
-(defcfun timer-new timer)
+(defcfun-debug-logging timer-new timer)
 
-(defcfun timer-release timer
+(defcfun-debug-logging timer-release timer
   (timer timer))
 
-(defcfun context-set-timer :void
+(defcfun-debug-logging context-set-timer :void
   (ctxt context)
   (timer timer))
 
-(defcfun context-get-timer timer
+(defcfun-debug-logging context-get-timer timer
   (ctxt context))
 
-(defcfun timer-push :void
+(defcfun-debug-logging timer-push :void
   (timer timer)
   (item-name :string))
 
-(defcfun timer-pop :void
+(defcfun-debug-logging timer-pop :void
   (timer timer)
   (item-name :string))
 
-(defcfun timer-print :void
+(defcfun-debug-logging timer-print :void
   (timer timer)
   (f-out :pointer))                     ; FILE *
 
 ;#+rvalue-set-bool-require-tail-call
-(defcfun rvalue-set-bool-require-tail-call :void
+(defcfun-debug-logging rvalue-set-bool-require-tail-call :void
   (call rvalue)
   (require-tail-call :int))
 
 ;#+type-get-aligned
-(defcfun type-get-aligned type
+(defcfun-debug-logging type-get-aligned type
   (type type)
   (alignment-in-bytes :size))
 
 ;#+type-get-vector
-(defcfun type-get-vector type
+(defcfun-debug-logging type-get-vector type
   (type type)
   (num-units :size))
 
 ;#+function-get-address
-(defcfun function-get-address rvalue
+(defcfun-debug-logging function-get-address rvalue
   (fn function)
   (loc location))
 
 ;#+context-new-rvalue-from-vector
-(defcfun context-new-rvalue-from-vector rvalue
+(defcfun-debug-logging context-new-rvalue-from-vector rvalue
   (ctxt context)
   (loc location)
   (vec-type type)
@@ -776,20 +776,20 @@
   (elements rvalue))
 
 ;#+version
-(defcfun version-major :int)
+(defcfun-debug-logging version-major :int)
 
-(defcfun version-minor :int)
+(defcfun-debug-logging version-minor :int)
 
-(defcfun version-patchlevel :int)
+(defcfun-debug-logging version-patchlevel :int)
 
 ;;; Asm support
 ;#+asm-statements
-(defcfun block-add-extended-asm extended-asm
+(defcfun-debug-logging block-add-extended-asm extended-asm
   (block_ block)
   (loc location)
   (asm-template :string))
 
-(defcfun block-end-with-extended-asm-goto  extended-asm
+(defcfun-debug-logging block-end-with-extended-asm-goto  extended-asm
   (block_ block)
   (loc location)
   (asm-template :string)
@@ -797,83 +797,83 @@
   (goto-blocks (:pointer block))
   (fallthrough-block block))
 
-(defcfun extended-asm-as-object object
+(defcfun-debug-logging extended-asm-as-object object
   (ext-asm extended-asm))
 
-(defcfun extended-asm-set-volatile-flag :void
+(defcfun-debug-logging extended-asm-set-volatile-flag :void
   (ext-asm extended-asm)
   (flag :int))
 
-(defcfun extended-asm-set-inline-flag :void
+(defcfun-debug-logging extended-asm-set-inline-flag :void
   (ext-asm extended-asm)
   (flag :int))
 
-(defcfun extended-asm-add-output-operand :void
+(defcfun-debug-logging extended-asm-add-output-operand :void
   (ext-asm extended-asm)
   (asm-symbolic-name :string)
   (constraint :string)
   (dest lvalue))
 
-(defcfun extended-asm-add-input-operand :void
+(defcfun-debug-logging extended-asm-add-input-operand :void
   (ext-asm extended-asm)
   (asm-symbolic-name :string)
   (constraint :string)
   (src rvalue))
 
-(defcfun extended-asm-add-clobber :void
+(defcfun-debug-logging extended-asm-add-clobber :void
   (ext-asm extended-asm)
   (victim :string))
 
-(defcfun add-top-level-asm :void
+(defcfun-debug-logging add-top-level-asm :void
   (ctxt context)
   (loc location)
   (asm-stmts :string))
 
 ;#+reflection
-(defcfun function-get-return-type type
+(defcfun-debug-logging function-get-return-type type
   (func function))
 
-(defcfun function-get-param-count :size
+(defcfun-debug-logging function-get-param-count :size
   (func function))
 
-(defcfun type-dyncast-array type
+(defcfun-debug-logging type-dyncast-array type
   (type type))
 
-(defcfun type-is-bool :int
+(defcfun-debug-logging type-is-bool :int
   (type type))
 
-(defcfun type-dyncast-function-ptr-type function-type
+(defcfun-debug-logging type-dyncast-function-ptr-type function-type
   (type type))
 
-(defcfun function-type-get-return-type type
+(defcfun-debug-logging function-type-get-return-type type
   (function-type function-type))
 
-(defcfun function-type-get-param-count :size
+(defcfun-debug-logging function-type-get-param-count :size
   (function-type function-type))
 
-(defcfun function-type-get-param-type type
+(defcfun-debug-logging function-type-get-param-type type
   (function-type function-type)
   (index :size))
 
-(defcfun type-is-integral :int
+(defcfun-debug-logging type-is-integral :int
   (type type))
 
-(defcfun type-is-pointer type
+(defcfun-debug-logging type-is-pointer type
   (type type))
 
-(defcfun type-dyncast-vector vector-type
+(defcfun-debug-logging type-dyncast-vector vector-type
   (type type))
 
-(defcfun type-is-struct struct
+(defcfun-debug-logging type-is-struct struct
   (type type))
 
-(defcfun vector-type-get-num-units :size
+(defcfun-debug-logging vector-type-get-num-units :size
   (vector-type vector-type))
 
-(defcfun vector-type-get-element-type type
+(defcfun-debug-logging vector-type-get-element-type type
   (vector-type vector-type))
 
-(defcfun type-unqualified type
+(defcfun-debug-logging type-unqualified type
   (type type))
 
 (defcenum fn-attribute
@@ -893,16 +893,16 @@
   :fn-attribute-max                                  ; just for indicate the maximum value of this enum
   )
 
-(defcfun funciton-add-attribute :void
+(defcfun-debug-logging funciton-add-attribute :void
   (func function)
   (attribute fn-attribute))
 
-(defcfun function-add-string-attribute :void
+(defcfun-debug-logging function-add-string-attribute :void
   (func function)
   (attribute fn-attribute)
   (value :string))
 
-(defcfun function-add-integer-array-attribute :void
+(defcfun-debug-logging function-add-integer-array-attribute :void
   (func function)
   (attribute fn-attribute)
   (value (:pointer :int))
@@ -912,12 +912,12 @@
   :variable-attribute-visibility
   :variable-attribute-max)
 
-(defcfun lvalue-add-string-attribute :void
+(defcfun-debug-logging lvalue-add-string-attribute :void
   (variable lvalue)
   (attribute variable-attribute)
   (value :string))
 
 ;#+context-set-output-ident
-(defcfun context-set-output-ident :void
+(defcfun-debug-logging context-set-output-ident :void
   (ctxt context)
   (output-ident :string))
