@@ -10,6 +10,7 @@
   :serial t
   :components ((:file "packages")
                (:file "load")
+               (:file "debug")
                (:file "ffi"))
   :in-order-to ((test-op (test-op :cl-gccjit/tests))))
 
