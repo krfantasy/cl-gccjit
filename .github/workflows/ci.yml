@@ -36,6 +36,11 @@ jobs:
           tools: libgccjit gcc
           cache: yes
 
+      - name: Extra libgccjit setup (macOS)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: |
+          brew link libgccjit gcc
+
       - name: Setup
         uses: 40ants/setup-lisp@v4
         with:
