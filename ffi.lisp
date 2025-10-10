@@ -89,7 +89,7 @@
   (ctxt context))
 
 (defcenum output-kind
-  :output-kind-assmebler
+  :output-kind-assembler
   :output-kind-object-file
   :output-kind-dynamic-library
   :output-kind-executable)
@@ -158,17 +158,17 @@
   ;; C's "char" and the variants
   :type-char
   :type-signed-char
-  :type-unsigned-int-char
+  :type-unsigned-char
 
   ;; C's integer types
   :type-short
-  :type-unsigned-int-short
+  :type-unsigned-short
   :type-int
-  :type-unsigned-int-int
+  :type-unsigned-int
   :type-long
-  :type-unsigned-int-long
+  :type-unsigned-long
   :type-long-long
-  :type-unsigned-int-long-long
+  :type-unsigned-long-long
 
   ;; floating-point types
   :type-float
@@ -293,7 +293,7 @@
   (num-fields :int)
   (fields (:pointer field)))
 
-(defcfun-debug-logging context-new-funciton-ptr-type type
+(defcfun-debug-logging context-new-function-ptr-type type
   (ctxt context)
   (loc location)
   (return-type type)
@@ -319,7 +319,7 @@
 
 (defcenum function-kind
   :function-kind-exported
-  :function-kind-internel
+  :function-kind-internal
   :function-kind-imported
   :function-kind-always-inline)
 
@@ -410,7 +410,7 @@
   (init-value rvalue))
 
 ;#+get-target-builtin-function
-(defcfun-debug-logging context-get-target-builtin-funciton function
+(defcfun-debug-logging context-get-target-builtin-function function
   (ctxt context)
   (name :string))
 
@@ -421,7 +421,7 @@
   (num-bytes :size))
 
 ;#+global-set-readonly
-(defcfun-debug-logging global-set-randomly :void
+(defcfun-debug-logging global-set-readonly :void
   (global lvalue))
 
 (defcfun-debug-logging lvalue-as-object object
@@ -504,7 +504,7 @@
   :binary-op-bitwise-xor
   :binary-op-bitwise-or
   :binary-op-logical-and
-  :binary-op-lgoical-or
+  :binary-op-logical-or
   :binary-op-lshift
   :binary-op-rshift)
 
@@ -890,10 +890,10 @@
   :fn-attribute-const
   :fn-attribute-weak
   :fn-attribute-nonnull
-  :fn-attribute-max                                  ; just for indicate the maximum value of this enum
+  :fn-attribute-max                                  ; just for indicating the maximum value of this enum
   )
 
-(defcfun-debug-logging funciton-add-attribute :void
+(defcfun-debug-logging function-add-attribute :void
   (func function)
   (attribute fn-attribute))
 
